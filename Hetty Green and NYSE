@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hetty Green & The Passive | Interactive Reading</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #aa001a;
+      --pale: #f2edec;
+      --black: #000000;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Playfair Display", Georgia, serif;
+      background: var(--pale);
+      color: var(--black);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    h1 { font-size: 20px; margin: 0 0 10px; }
+    h2, h3 { font-size: 16px; margin: 0 0 10px; }
+    p, button, input, label, span { font-family: "Playfair Display", Georgia, serif; font-size: 14px; }
+
+    .app {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .hero {
+      background: var(--black);
+      color: var(--white);
+      padding: 26px 20px;
+      border-radius: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.15);
+    }
+
+    .hero .tag {
+      color: var(--pale);
+      border-top: 2px solid var(--red);
+      padding-top: 12px;
+      margin-top: 14px;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--pale);
+      padding: 10px 0;
+    }
+
+    .nav button {
+      border: 1px solid var(--black);
+      background: var(--white);
+      color: var(--black);
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .nav button:hover,
+    .nav button.active {
+      background: var(--red);
+      border-color: var(--red);
+      color: var(--white);
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--black);
+      border-radius: 22px;
+      padding: 20px;
+      margin: 16px 0;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .reading p { margin: 0 0 16px; }
+
+    .gap-wrapper {
+      display: inline-block;
+      position: relative;
+      vertical-align: baseline;
+      margin: 0 3px;
+    }
+
+    .gap-button {
+      min-width: 118px;
+      border: 1px solid var(--red);
+      border-bottom: 2px solid var(--red);
+      background: var(--pale);
+      color: var(--black);
+      border-radius: 9px;
+      padding: 2px 8px;
+      cursor: pointer;
+      text-align: center;
+      line-height: 1.45;
+    }
+
+    .gap-button.unanswered::after {
+      content: " ▼";
+      color: var(--red);
+    }
+
+    .gap-button.correct {
+      background: var(--white);
+      border-color: var(--red);
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    .gap-button.wrong {
+      background: var(--black);
+      border-color: var(--black);
+      color: var(--white);
+    }
+
+    .dropdown {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: calc(100% + 6px);
+      min-width: 170px;
+      background: var(--white);
+      border: 1px solid var(--black);
+      border-radius: 14px;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.18);
+      z-index: 50;
+      overflow: hidden;
+    }
+
+    .dropdown.open { display: block; }
+
+    .dropdown button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: var(--white);
+      color: var(--black);
+      border: 0;
+      border-bottom: 1px solid var(--pale);
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+
+    .dropdown button:hover {
+      background: var(--pale);
+      color: var(--red);
+    }
+
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--pale);
+      border: 1px solid var(--black);
+      border-radius: 16px;
+      padding: 12px;
+      margin: 16px 0;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button.primary {
+      background: var(--red);
+      color: var(--white);
+      border: 1px solid var(--red);
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button.secondary {
+      background: var(--white);
+      color: var(--black);
+      border: 1px solid var(--black);
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button.primary:hover,
+    button.secondary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+    }
+
+    .score {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 14px;
+      background: var(--pale);
+      border: 1px solid var(--black);
+      display: none;
+    }
+
+    .note {
+      font-style: italic;
+      border-left: 4px solid var(--red);
+      padding-left: 12px;
+      margin: 14px 0;
+    }
+
+    .sentence-card {
+      border: 1px solid var(--black);
+      border-radius: 16px;
+      padding: 14px;
+      background: var(--pale);
+      margin-bottom: 12px;
+    }
+
+    .sentence-card input {
+      width: 100%;
+      padding: 9px;
+      margin-top: 8px;
+      border: 1px solid var(--black);
+      border-radius: 10px;
+      background: var(--white);
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: 14px;
+    }
+
+    .answer {
+      display: none;
+      margin-top: 8px;
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--black);
+      color: var(--white);
+      border-radius: 999px;
+      padding: 4px 10px;
+      margin: 3px 3px 3px 0;
+    }
+
+    .question {
+      border-top: 1px solid var(--black);
+      padding: 15px 0;
+    }
+
+    .question:first-child { border-top: none; }
+
+    .footer {
+      text-align: center;
+      padding: 22px;
+      color: var(--black);
+    }
+
+    @media (max-width: 720px) {
+      .app { padding: 12px; }
+      .hero, .card { border-radius: 16px; }
+      .gap-wrapper { display: inline; position: static; }
+      .gap-button { min-width: 105px; margin: 3px 0; }
+      .dropdown {
+        position: fixed;
+        left: 14px;
+        right: 14px;
+        top: auto;
+        bottom: 18px;
+        width: auto;
+        z-index: 100;
+      }
+      .dropdown button {
+        padding: 14px 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <section class="hero">
+      <h1>Hetty Green & The Passive</h1>
+      <h2>Interactive reading with inline gap-fill choices</h2>
+      <p class="tag">Click directly on each gap in the text, choose the best option and continue reading.</p>
+    </section>
+
+    <nav class="nav" aria-label="Lesson navigation">
+      <button class="active" data-target="reading">1. Interactive Reading</button>
+      <button data-target="passive">2. Passive Practice</button>
+      <button data-target="discussion">3. Discussion</button>
+    </nav>
+
+    <section id="reading" class="section active">
+      <div class="card reading">
+        <h1>The Story of Hetty Green</h1>
+
+        <div class="status-bar">
+          <span><strong>Completed:</strong> <span id="completed">0</span>/15</span>
+          <span><strong>Correct:</strong> <span id="correct">0</span></span>
+          <span><strong>Portfolio:</strong> $<span id="portfolio">10000</span></span>
+        </div>
+
+        <p>At the end of the 19<sup>th</sup> century in New York, an old woman was often seen walking up and down Wall Street. Her old black dress was dirty and she always walked alone carrying a bag with lunch inside. She was <span class="gap-wrapper" data-gap="50"></span> a familiar sight that everybody called her “The Witch of Wall Street.” Her name was Hetty Green, and you wouldn’t believe that she was a millionaire.</p>
+
+        <p>Hetty was born into a rich family <span class="gap-wrapper" data-gap="51"></span> 21<sup>st</sup> November 1834. She was an only child, and because her mother was too ill to raise her, her father and grandfather <span class="gap-wrapper" data-gap="52"></span> care of Hetty. They taught her to understand money from a young age. They also read financial reports to her while <span class="gap-wrapper" data-gap="53"></span> parents read bedtime stories to their children.</p>
+
+        <p>When Hetty grew up, she became a financier. Although her writing contained <span class="gap-wrapper" data-gap="54"></span> spelling mistakes, she definitely understood numbers. More importantly, she knew <span class="gap-wrapper" data-gap="55"></span> to make money. She bought and sold railroads and gave loans.</p>
+
+        <p>Hetty believed that all men were only interested <span class="gap-wrapper" data-gap="56"></span> her money. She was 33 when she met Edward Green, who decided <span class="gap-wrapper" data-gap="57"></span> her not just for her money. After their wedding, they moved into a small house and had two children, Ned and Sylvia. Unfortunately, Edward wasn’t as good with money <span class="gap-wrapper" data-gap="58"></span> Hetty, so she did everything she could to keep their finances separate. In the end, Edward moved out of the house and Hetty didn’t even want to look after him <span class="gap-wrapper" data-gap="59"></span> the last months of his life.</p>
+
+        <p>Their two children lived a poor existence with their mother and they both <span class="gap-wrapper" data-gap="60"></span> old dirty clothes because Hetty didn’t want to buy them new ones. Sylvia had very few friends and Ned’s life wasn’t easy either. One day, when he <span class="gap-wrapper" data-gap="61"></span> the street, he was hit by a horse. The accident left him in need of medical help. But Hetty <span class="gap-wrapper" data-gap="62"></span> to take him to hospital because she didn’t want to pay for the medical care there. Although she thought his leg would get better by itself, it got worse and in the end it had to be amputated.</p>
+
+        <p>When Hetty died in 1916, she was <span class="gap-wrapper" data-gap="63"></span> than anybody else in the USA. She left her millions to her children who each chose different ways <span class="gap-wrapper" data-gap="64"></span> spending the money. Sylvia made few changes in her life, but Ned started spending the money. But he died soon after, leaving the rest of his money to Sylvia, who decided to give all of it to charity.</p>
+
+        <div class="controls">
+          <button class="primary" onclick="checkAll()">Check all answers</button>
+          <button class="secondary" onclick="showAnswers()">Show answers</button>
+          <button class="secondary" onclick="resetAll()">Reset</button>
+        </div>
+
+        <div id="result" class="score"></div>
+
+        <div class="note">Mobile tip: tap a gap to open the answer choices at the bottom of the screen.</div>
+      </div>
+    </section>
+
+    <section id="passive" class="section">
+      <div class="card">
+        <h1>Passive Voice Practice</h1>
+        <h2>Rewrite the active sentences in the passive.</h2>
+        <div id="passiveTasks"></div>
+        <div class="controls">
+          <button class="primary" onclick="revealPassive()">Reveal suggested answers</button>
+          <button class="secondary" onclick="hidePassive()">Hide answers</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="discussion" class="section">
+      <div class="card">
+        <h1>Discussion & Reflection</h1>
+        <p><span class="badge">Money</span><span class="badge">Reputation</span><span class="badge">Family</span><span class="badge">Wall Street</span><span class="badge">Ethics</span></p>
+
+        <div class="question"><h3>1. Why do you think Hetty Green was called “The Witch of Wall Street”?</h3></div>
+        <div class="question"><h3>2. Was she a financial genius, a greedy person, or both?</h3></div>
+        <div class="question"><h3>3. Is it possible to admire someone’s intelligence but criticise their behaviour?</h3></div>
+        <div class="question"><h3>4. What is more important in investing: courage, caution, patience, or luck?</h3></div>
+        <div class="question"><h3>5. Which passive structures can you find in the story?</h3><p>Example: <strong>was often seen</strong></p></div>
+
+        <div class="note">Extension writing task: Write a short paragraph beginning: “Hetty Green is remembered as…” Use at least three passive structures.</div>
+      </div>
+    </section>
+
+    <p class="footer">Designed for classroom use · British English · Interactive grammar and reading practice</p>
+  </main>
+
+  <script>
+    const gaps = {
+      50: { options: ["such", "as", "so"], answer: "such", explanation: "such a familiar sight" },
+      51: { options: ["on", "in", "at"], answer: "on", explanation: "on + date" },
+      52: { options: ["gave", "took", "had"], answer: "took", explanation: "take care of" },
+      53: { options: ["another", "others", "other"], answer: "other", explanation: "other parents" },
+      54: { options: ["a lot of", "much", "plenty"], answer: "a lot of", explanation: "a lot of + plural countable noun" },
+      55: { options: ["which", "what", "how"], answer: "how", explanation: "know how to do something" },
+      56: { options: ["of", "in", "about"], answer: "in", explanation: "interested in" },
+      57: { options: ["marry", "marrying", "to marry"], answer: "to marry", explanation: "decide to do something" },
+      58: { options: ["like", "as", "so"], answer: "as", explanation: "as good as" },
+      59: { options: ["on", "during", "at"], answer: "during", explanation: "during + period of time" },
+      60: { options: ["put", "dressed", "wore"], answer: "wore", explanation: "wear clothes" },
+      61: { options: ["was crossing", "was crossed", "has crossed"], answer: "was crossing", explanation: "action in progress in the past" },
+      62: { options: ["supposed", "afforded", "refused"], answer: "refused", explanation: "refuse to do something" },
+      63: { options: ["rich", "richer", "the richest"], answer: "richer", explanation: "richer than" },
+      64: { options: ["in", "to", "of"], answer: "of", explanation: "ways of doing something" }
+    };
+
+    const passiveData = [
+      ["People often saw an old woman walking up and down Wall Street.", "An old woman was often seen walking up and down Wall Street."],
+      ["Everybody called her “The Witch of Wall Street”.", "She was called “The Witch of Wall Street”."],
+      ["Her father and grandfather taught her to understand money.", "She was taught to understand money by her father and grandfather."],
+      ["They read financial reports to her.", "Financial reports were read to her."],
+      ["A horse hit Ned when he was crossing the street.", "Ned was hit by a horse when he was crossing the street."],
+      ["Doctors had to amputate his leg.", "His leg had to be amputated."],
+      ["Hetty left her millions to her children.", "Her millions were left to her children."],
+      ["Sylvia gave all the money to charity.", "All the money was given to charity."]
+    ];
+
+    let selections = {};
+    let portfolio = 10000;
+
+    function renderGaps() {
+      document.querySelectorAll(".gap-wrapper").forEach(wrapper => {
+        const n = wrapper.dataset.gap;
+        const data = gaps[n];
+
+        wrapper.innerHTML = `
+          <button class="gap-button unanswered" type="button" onclick="toggleDropdown('${n}', event)">(${n})</button>
+          <div class="dropdown" id="dropdown-${n}">
+            ${data.options.map(opt => `<button type="button" onclick="selectOption('${n}', '${escapeHtml(opt)}')">${opt}</button>`).join("")}
+          </div>
+        `;
+      });
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/'/g, "\\'");
+    }
+
+    function toggleDropdown(n, event) {
+      event.stopPropagation();
+      closeDropdowns(n);
+      const dropdown = document.getElementById(`dropdown-${n}`);
+      dropdown.classList.toggle("open");
+    }
+
+    function closeDropdowns(except = null) {
+      document.querySelectorAll(".dropdown").forEach(dd => {
+        if (!except || dd.id !== `dropdown-${except}`) dd.classList.remove("open");
+      });
+    }
+
+    function selectOption(n, value) {
+      selections[n] = value;
+      const wrapper = document.querySelector(`.gap-wrapper[data-gap="${n}"]`);
+      const button = wrapper.querySelector(".gap-button");
+      button.textContent = value;
+      button.classList.remove("unanswered", "correct", "wrong");
+      document.getElementById(`dropdown-${n}`).classList.remove("open");
+      updateCounters(false);
+    }
+
+    function checkAll() {
+      let correct = 0;
+      let completed = 0;
+      portfolio = 10000;
+
+      Object.keys(gaps).forEach(n => {
+        const wrapper = document.querySelector(`.gap-wrapper[data-gap="${n}"]`);
+        const button = wrapper.querySelector(".gap-button");
+        button.classList.remove("correct", "wrong");
+
+        if (selections[n]) {
+          completed++;
+          if (selections[n] === gaps[n].answer) {
+            correct++;
+            portfolio += 500;
+            button.classList.add("correct");
+          } else {
+            portfolio -= 300;
+            button.classList.add("wrong");
+          }
+        }
+      });
+
+      updateDisplay(completed, correct, portfolio);
+
+      const result = document.getElementById("result");
+      result.style.display = "block";
+      result.innerHTML = `<strong>Your result: ${correct}/15 correct.</strong><br>
+      Portfolio value: <strong>$${portfolio}</strong><br>
+      ${getMessage(correct)}`;
+
+      result.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function updateCounters() {
+      let completed = Object.keys(selections).length;
+      let correct = Object.keys(selections).filter(n => selections[n] === gaps[n].answer).length;
+      updateDisplay(completed, correct, portfolio);
+    }
+
+    function updateDisplay(completed, correct, currentPortfolio) {
+      document.getElementById("completed").textContent = completed;
+      document.getElementById("correct").textContent = correct;
+      document.getElementById("portfolio").textContent = currentPortfolio;
+    }
+
+    function getMessage(correct) {
+      if (correct >= 14) return "Excellent. Hetty Green would probably approve of your precision.";
+      if (correct >= 11) return "Strong performance. You understood most of the language patterns.";
+      if (correct >= 8) return "Good start. Review the black gaps and try again.";
+      return "The market was difficult today. Read the story again and make a new investment attempt.";
+    }
+
+    function showAnswers() {
+      Object.keys(gaps).forEach(n => {
+        selections[n] = gaps[n].answer;
+        const wrapper = document.querySelector(`.gap-wrapper[data-gap="${n}"]`);
+        const button = wrapper.querySelector(".gap-button");
+        button.textContent = gaps[n].answer;
+        button.classList.remove("unanswered", "wrong");
+        button.classList.add("correct");
+      });
+      checkAll();
+    }
+
+    function resetAll() {
+      selections = {};
+      portfolio = 10000;
+      document.querySelectorAll(".gap-wrapper").forEach(wrapper => {
+        const n = wrapper.dataset.gap;
+        const button = wrapper.querySelector(".gap-button");
+        button.textContent = `(${n})`;
+        button.classList.remove("correct", "wrong");
+        button.classList.add("unanswered");
+      });
+      closeDropdowns();
+      updateDisplay(0, 0, portfolio);
+      const result = document.getElementById("result");
+      result.style.display = "none";
+      result.innerHTML = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderPassive() {
+      const container = document.getElementById("passiveTasks");
+      container.innerHTML = passiveData.map((item, index) => `
+        <div class="sentence-card">
+          <h3>${index + 1}. ${item[0]}</h3>
+          <input type="text" placeholder="Write your passive sentence here...">
+          <div class="answer">${item[1]}</div>
+        </div>
+      `).join("");
+    }
+
+    function revealPassive() {
+      document.querySelectorAll(".answer").forEach(a => a.style.display = "block");
+    }
+
+    function hidePassive() {
+      document.querySelectorAll(".answer").forEach(a => a.style.display = "none");
+    }
+
+    document.addEventListener("click", () => closeDropdowns());
+
+    document.querySelectorAll(".nav button").forEach(button => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.target;
+        document.querySelectorAll(".nav button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        document.querySelectorAll(".section").forEach(section => section.classList.remove("active"));
+        document.getElementById(target).classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+
+    renderGaps();
+    renderPassive();
+  </script>
+</body>
+</html>
