@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hetty Green & The Passive | Interactive Lesson</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #aa001a;
+      --pale: #f2edec;
+      --black: #000000;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Playfair Display", Georgia, serif;
+      background: var(--pale);
+      color: var(--black);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0 0 10px;
+      letter-spacing: 0.02em;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin: 0 0 10px;
+    }
+
+    h3 {
+      font-size: 16px;
+      margin: 0 0 8px;
+    }
+
+    p, button, select, option, input, label {
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: 14px;
+    }
+
+    .app {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .hero {
+      background: var(--black);
+      color: var(--white);
+      padding: 26px 20px;
+      border-radius: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 26px rgba(0,0,0,0.15);
+    }
+
+    .hero .tag {
+      color: var(--pale);
+      border-top: 2px solid var(--red);
+      padding-top: 12px;
+      margin-top: 14px;
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--pale);
+      padding: 10px 0;
+    }
+
+    .nav button {
+      border: 1px solid var(--black);
+      background: var(--white);
+      color: var(--black);
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .nav button:hover,
+    .nav button.active {
+      background: var(--red);
+      border-color: var(--red);
+      color: var(--white);
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--black);
+      border-radius: 22px;
+      padding: 20px;
+      margin: 16px 0;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .reading p {
+      margin: 0 0 16px;
+    }
+
+    .gap {
+      display: inline-block;
+      min-width: 150px;
+      margin: 0 3px;
+      border-bottom: 2px solid var(--red);
+      vertical-align: baseline;
+    }
+
+    select {
+      width: 100%;
+      max-width: 270px;
+      border: 1px solid var(--black);
+      border-radius: 10px;
+      padding: 7px 8px;
+      background: var(--pale);
+      color: var(--black);
+      outline: none;
+    }
+
+    .inline-select {
+      width: auto;
+      min-width: 150px;
+      margin: 0 3px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button.primary {
+      background: var(--red);
+      color: var(--white);
+      border: 1px solid var(--red);
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button.secondary {
+      background: var(--white);
+      color: var(--black);
+      border: 1px solid var(--black);
+      padding: 10px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button.primary:hover,
+    button.secondary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+    }
+
+    .score {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 14px;
+      background: var(--pale);
+      border: 1px solid var(--black);
+      display: none;
+    }
+
+    .correct {
+      background: rgba(170, 0, 26, 0.08);
+      border-color: var(--red) !important;
+    }
+
+    .wrong {
+      background: var(--black) !important;
+      color: var(--white) !important;
+      border-color: var(--black) !important;
+    }
+
+    .question {
+      border-top: 1px solid var(--black);
+      padding: 15px 0;
+    }
+
+    .question:first-child {
+      border-top: none;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(160px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .option {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      border: 1px solid var(--black);
+      border-radius: 12px;
+      padding: 9px;
+      background: var(--pale);
+      cursor: pointer;
+    }
+
+    .option input {
+      margin-top: 5px;
+      accent-color: var(--red);
+    }
+
+    .feedback {
+      margin-top: 8px;
+      display: none;
+      padding: 8px 10px;
+      border-left: 4px solid var(--red);
+      background: var(--pale);
+    }
+
+    .mini-task {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .sentence-card {
+      border: 1px solid var(--black);
+      border-radius: 16px;
+      padding: 14px;
+      background: var(--pale);
+    }
+
+    .sentence-card input {
+      width: 100%;
+      padding: 9px;
+      margin-top: 8px;
+      border: 1px solid var(--black);
+      border-radius: 10px;
+      background: var(--white);
+    }
+
+    .answer {
+      display: none;
+      margin-top: 8px;
+      color: var(--red);
+      font-weight: 600;
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--black);
+      color: var(--white);
+      border-radius: 999px;
+      padding: 4px 10px;
+      margin: 3px 3px 3px 0;
+    }
+
+    .note {
+      font-style: italic;
+      border-left: 4px solid var(--red);
+      padding-left: 12px;
+      margin: 14px 0;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 22px;
+      color: var(--black);
+    }
+
+    @media (max-width: 720px) {
+      .options {
+        grid-template-columns: 1fr;
+      }
+
+      .inline-select {
+        width: 100%;
+        margin: 5px 0;
+      }
+
+      .hero, .card {
+        border-radius: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="hero">
+      <h1>Hetty Green & The Passive</h1>
+      <h2>Interactive reading, multiple-choice quiz and passive voice practice</h2>
+      <p class="tag">A mysterious Wall Street story about money, reputation, family and the woman called “The Witch of Wall Street”.</p>
+    </section>
+
+    <nav class="nav" aria-label="Lesson navigation">
+      <button class="active" data-target="reading">1. Reading</button>
+      <button data-target="gapfill">2. Gap-fill Quiz</button>
+      <button data-target="passive">3. Passive Practice</button>
+      <button data-target="discussion">4. Discussion</button>
+    </nav>
+
+    <section id="reading" class="section active">
+      <div class="card reading">
+        <h1>The Story of Hetty Green</h1>
+        <p>At the end of the 19<sup>th</sup> century in New York, an old woman was often seen walking up and down Wall Street. Her old black dress was dirty and she always walked alone carrying a bag with lunch inside. She was <span class="gap">50</span> a familiar sight that everybody called her “The Witch of Wall Street.” Her name was Hetty Green, and you wouldn’t believe that she was a millionaire.</p>
+
+        <p>Hetty was born into a rich family <span class="gap">51</span> 21<sup>st</sup> November 1834. She was an only child, and because her mother was too ill to raise her, her father and grandfather <span class="gap">52</span> care of Hetty. They taught her to understand money from a young age. They also read financial reports to her while <span class="gap">53</span> parents read bedtime stories to their children.</p>
+
+        <p>When Hetty grew up, she became a financier. Although her writing contained <span class="gap">54</span> spelling mistakes, she definitely understood numbers. More importantly, she knew <span class="gap">55</span> to make money. She bought and sold railroads and gave loans.</p>
+
+        <p>Hetty believed that all men were only interested <span class="gap">56</span> her money. She was 33 when she met Edward Green, who decided <span class="gap">57</span> her not just for her money. After their wedding, they moved into a small house and had two children, Ned and Sylvia. Unfortunately, Edward wasn’t as good with money <span class="gap">58</span> Hetty, so she did everything she could to keep their finances separate. In the end, Edward moved out of the house and Hetty didn’t even want to look after him <span class="gap">59</span> the last months of his life.</p>
+
+        <p>Their two children lived a poor existence with their mother and they both <span class="gap">60</span> old dirty clothes because Hetty didn’t want to buy them new ones. Sylvia had very few friends and Ned’s life wasn’t easy either. One day, when he <span class="gap">61</span> the street, he was hit by a horse. The accident left him in need of medical help. But Hetty <span class="gap">62</span> to take him to hospital because she didn’t want to pay for the medical care there. Although she thought his leg would get better by itself, it got worse and in the end it had to be amputated.</p>
+
+        <p>When Hetty died in 1916, she was <span class="gap">63</span> than anybody else in the USA. She left her millions to her children who each chose different ways <span class="gap">64</span> spending the money. Sylvia made few changes in her life, but Ned started spending the money. But he died soon after, leaving the rest of his money to Sylvia, who decided to give all of it to charity.</p>
+
+        <div class="note">Reading task: First read the whole story without choosing the missing words. What kind of person do you think Hetty Green was?</div>
+      </div>
+    </section>
+
+    <section id="gapfill" class="section">
+      <div class="card">
+        <h1>Multiple Choice Gap-fill Quiz</h1>
+        <h2>Complete the gaps with one of the given words.</h2>
+        <p>Choose the best option for each gap. Then check your score.</p>
+
+        <div id="quiz"></div>
+
+        <div class="controls">
+          <button class="primary" onclick="checkQuiz()">Check answers</button>
+          <button class="secondary" onclick="showQuizAnswers()">Show answers</button>
+          <button class="secondary" onclick="resetQuiz()">Reset</button>
+        </div>
+        <div id="quizScore" class="score"></div>
+      </div>
+    </section>
+
+    <section id="passive" class="section">
+      <div class="card">
+        <h1>Passive Voice Practice</h1>
+        <h2>Rewrite the active sentences in the passive.</h2>
+        <p>Use the story to help you. Several answers may be possible, but the suggested answers below are natural versions.</p>
+
+        <div class="mini-task" id="passiveTasks"></div>
+
+        <div class="controls">
+          <button class="primary" onclick="revealPassive()">Reveal suggested answers</button>
+          <button class="secondary" onclick="hidePassive()">Hide answers</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="discussion" class="section">
+      <div class="card">
+        <h1>Discussion & Reflection</h1>
+        <h2>Use these prompts for pair or group work.</h2>
+
+        <p><span class="badge">Money</span><span class="badge">Reputation</span><span class="badge">Family</span><span class="badge">Wall Street</span><span class="badge">Ethics</span></p>
+
+        <div class="question">
+          <h3>1. Why do you think Hetty Green was called “The Witch of Wall Street”?</h3>
+        </div>
+        <div class="question">
+          <h3>2. Was she a financial genius, a greedy person, or both?</h3>
+        </div>
+        <div class="question">
+          <h3>3. Is it possible to admire someone’s intelligence but criticise their behaviour?</h3>
+        </div>
+        <div class="question">
+          <h3>4. What is more important in investing: courage, caution, patience, or luck?</h3>
+        </div>
+        <div class="question">
+          <h3>5. Which passive structures can you find in the story?</h3>
+          <p>Example: <strong>was often seen</strong></p>
+        </div>
+
+        <div class="note">Extension writing task: Write a short paragraph beginning: “Hetty Green is remembered as…” Use at least three passive structures.</div>
+      </div>
+    </section>
+
+    <p class="footer">Designed for classroom use · British English · Interactive grammar and reading practice</p>
+  </main>
+
+  <script>
+    const quizData = [
+      { n: 50, stem: "She was ___ a familiar sight...", options: {A: "such", B: "as", C: "so"}, answer: "A", explanation: "We use 'such a + adjective + noun': such a familiar sight." },
+      { n: 51, stem: "Hetty was born ___ 21st November 1834.", options: {A: "on", B: "in", C: "at"}, answer: "A", explanation: "We use 'on' with dates." },
+      { n: 52, stem: "Her father and grandfather ___ care of Hetty.", options: {A: "gave", B: "took", C: "had"}, answer: "B", explanation: "The phrase is 'take care of someone'." },
+      { n: 53, stem: "They read financial reports to her while ___ parents read bedtime stories.", options: {A: "another", B: "others", C: "other"}, answer: "C", explanation: "'Other parents' means different parents in general." },
+      { n: 54, stem: "Her writing contained ___ spelling mistakes.", options: {A: "a lot of", B: "much", C: "plenty"}, answer: "A", explanation: "'A lot of' is used with plural countable nouns." },
+      { n: 55, stem: "She knew ___ to make money.", options: {A: "which", B: "what", C: "how"}, answer: "C", explanation: "The natural phrase is 'know how to do something'." },
+      { n: 56, stem: "All men were only interested ___ her money.", options: {A: "of", B: "in", C: "about"}, answer: "B", explanation: "The adjective phrase is 'interested in something'." },
+      { n: 57, stem: "Edward decided ___ her.", options: {A: "marry", B: "marrying", C: "to marry"}, answer: "C", explanation: "'Decide' is followed by the infinitive: decide to do something." },
+      { n: 58, stem: "Edward wasn’t as good with money ___ Hetty.", options: {A: "like", B: "as", C: "so"}, answer: "B", explanation: "The comparison structure is 'as ... as'." },
+      { n: 59, stem: "She didn’t want to look after him ___ the last months of his life.", options: {A: "on", B: "during", C: "at"}, answer: "B", explanation: "'During' is used for a period of time." },
+      { n: 60, stem: "They both ___ old dirty clothes.", options: {A: "put", B: "dressed", C: "wore"}, answer: "C", explanation: "We wear clothes." },
+      { n: 61, stem: "One day, when he ___ the street, he was hit by a horse.", options: {A: "was crossing", B: "was crossed", C: "has crossed"}, answer: "A", explanation: "Past continuous describes the action in progress." },
+      { n: 62, stem: "Hetty ___ to take him to hospital.", options: {A: "supposed", B: "afforded", C: "refused"}, answer: "C", explanation: "'Refused to do something' means she would not do it." },
+      { n: 63, stem: "When Hetty died, she was ___ than anybody else in the USA.", options: {A: "rich", B: "richer", C: "the richest"}, answer: "B", explanation: "The word 'than' needs a comparative form: richer than." },
+      { n: 64, stem: "They each chose different ways ___ spending the money.", options: {A: "in", B: "to", C: "of"}, answer: "C", explanation: "The phrase is 'ways of doing something'." }
+    ];
+
+    const passiveData = [
+      {
+        active: "People often saw an old woman walking up and down Wall Street.",
+        passive: "An old woman was often seen walking up and down Wall Street."
+      },
+      {
+        active: "Everybody called her “The Witch of Wall Street”.",
+        passive: "She was called “The Witch of Wall Street”."
+      },
+      {
+        active: "Her father and grandfather taught her to understand money.",
+        passive: "She was taught to understand money by her father and grandfather."
+      },
+      {
+        active: "They read financial reports to her.",
+        passive: "Financial reports were read to her."
+      },
+      {
+        active: "A horse hit Ned when he was crossing the street.",
+        passive: "Ned was hit by a horse when he was crossing the street."
+      },
+      {
+        active: "Doctors had to amputate his leg.",
+        passive: "His leg had to be amputated."
+      },
+      {
+        active: "Hetty left her millions to her children.",
+        passive: "Her millions were left to her children."
+      },
+      {
+        active: "Sylvia gave all the money to charity.",
+        passive: "All the money was given to charity."
+      }
+    ];
+
+    function renderQuiz() {
+      const container = document.getElementById("quiz");
+      container.innerHTML = quizData.map(q => `
+        <div class="question" id="q${q.n}">
+          <h3>${q.n}. ${q.stem}</h3>
+          <div class="options">
+            ${Object.entries(q.options).map(([letter, text]) => `
+              <label class="option">
+                <input type="radio" name="q${q.n}" value="${letter}">
+                <span>${letter}) ${text}</span>
+              </label>
+            `).join("")}
+          </div>
+          <div class="feedback" id="fb${q.n}"></div>
+        </div>
+      `).join("");
+    }
+
+    function renderPassive() {
+      const container = document.getElementById("passiveTasks");
+      container.innerHTML = passiveData.map((item, index) => `
+        <div class="sentence-card">
+          <h3>${index + 1}. ${item.active}</h3>
+          <input type="text" placeholder="Write your passive sentence here...">
+          <div class="answer">${item.passive}</div>
+        </div>
+      `).join("");
+    }
+
+    function checkQuiz() {
+      let score = 0;
+
+      quizData.forEach(q => {
+        const selected = document.querySelector(`input[name="q${q.n}"]:checked`);
+        const feedback = document.getElementById(`fb${q.n}`);
+        const question = document.getElementById(`q${q.n}`);
+
+        question.classList.remove("correct", "wrong");
+        feedback.style.display = "block";
+
+        if (selected && selected.value === q.answer) {
+          score++;
+          question.classList.add("correct");
+          feedback.innerHTML = `Correct. ${q.explanation}`;
+        } else {
+          question.classList.add("wrong");
+          const chosen = selected ? selected.value : "no answer";
+          feedback.innerHTML = `Not quite. Your answer: ${chosen}. Correct answer: ${q.answer}) ${q.options[q.answer]}. ${q.explanation}`;
+        }
+      });
+
+      const scoreBox = document.getElementById("quizScore");
+      scoreBox.style.display = "block";
+      scoreBox.innerHTML = `<strong>Your score: ${score}/${quizData.length}</strong><br>${getScoreMessage(score, quizData.length)}`;
+      scoreBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function getScoreMessage(score, total) {
+      const percent = Math.round((score / total) * 100);
+      if (percent >= 90) return "Excellent. You have strong control of the target structures.";
+      if (percent >= 70) return "Good work. Review the explanations for the few weaker areas.";
+      if (percent >= 50) return "You understood the story, but some grammar patterns need more practice.";
+      return "Read the story again and focus on fixed phrases and grammar structures.";
+    }
+
+    function showQuizAnswers() {
+      quizData.forEach(q => {
+        const feedback = document.getElementById(`fb${q.n}`);
+        feedback.style.display = "block";
+        feedback.innerHTML = `Correct answer: ${q.answer}) ${q.options[q.answer]}. ${q.explanation}`;
+      });
+    }
+
+    function resetQuiz() {
+      document.querySelectorAll('input[type="radio"]').forEach(input => input.checked = false);
+      document.querySelectorAll(".question").forEach(q => q.classList.remove("correct", "wrong"));
+      document.querySelectorAll(".feedback").forEach(fb => {
+        fb.style.display = "none";
+        fb.innerHTML = "";
+      });
+      const scoreBox = document.getElementById("quizScore");
+      scoreBox.style.display = "none";
+      scoreBox.innerHTML = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function revealPassive() {
+      document.querySelectorAll(".answer").forEach(a => a.style.display = "block");
+    }
+
+    function hidePassive() {
+      document.querySelectorAll(".answer").forEach(a => a.style.display = "none");
+    }
+
+    document.querySelectorAll(".nav button").forEach(button => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.target;
+
+        document.querySelectorAll(".nav button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        document.querySelectorAll(".section").forEach(section => section.classList.remove("active"));
+        document.getElementById(target).classList.add("active");
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    });
+
+    renderQuiz();
+    renderPassive();
+  </script>
+</body>
+</html>
